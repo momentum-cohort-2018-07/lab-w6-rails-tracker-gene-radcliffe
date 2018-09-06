@@ -9,13 +9,16 @@ class Api::V1::AliensController < ApplicationController
     end
     def update
       if @alien.update(alien_params)
-        render json: @alien
+        render :json =>{
+            :status => :ok,
+            :message => "Record Updated"
+        }
       else
-        render json: @alien.errors
+        render json: @alien.errors, status: :unprocessable_entity
       end 
 
     end
-    def destroy
+    def destroy 
         @alien.delete
 
         render :json => { 
@@ -26,11 +29,11 @@ class Api::V1::AliensController < ApplicationController
 
     end
     def create
+        
         @alien = Alien.new(alien_params)
 
         if @alien.save
             render json:@alien
-        
         else
             
         end
@@ -41,10 +44,19 @@ class Api::V1::AliensController < ApplicationController
     private
 
     def alien_params
-        params.require(:alien).permit(:name, :specie,:notes,:home_world)
+       
+        params.require(:alien).permit(:name, :specie,:home_world)
     end
 
     def find_alien
-        @alien = Alien.find(params[:id])
+        begin
+            @alien = Alien.find(params[:id])
+        rescue StandardError => e
+            render :json=>{
+                :status => :not_found,
+                :message => "#{e}"
+            } 
+        end
+       
     end
 end

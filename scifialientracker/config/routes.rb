@@ -2,7 +2,9 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :aliens
+      resources :aliens do
+        resources :notes
+      end
     end
   end
   # get 'aliens/create'
