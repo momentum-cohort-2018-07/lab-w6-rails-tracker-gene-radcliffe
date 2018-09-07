@@ -1,6 +1,6 @@
 class Api::V1::NotesController < ApplicationController
     before_action :find_alien, only:[:index]
-    before_action :find_note, only:[:destroy]
+    before_action :find_note, only:[:destroy, :update]
     def index
       
         @notes = @alien.notes
@@ -14,6 +14,7 @@ class Api::V1::NotesController < ApplicationController
             render :json =>{
                 :status=> :created,
                 :message => "Record created"
+              
             }
         else
             render json:@note.errors, status: :unprocessable_entity
@@ -22,18 +23,44 @@ class Api::V1::NotesController < ApplicationController
 
     end
 
+    def update
+        
+        @note_old = @note
+        begin
+            @note.update(note_params)
+            # render :json =>{
+            #     :status=> :Updated,
+            #     :message => "Record updated",
+    
+            # }   
+        rescue StandardError => e
+            render :json =>{
+                :status=> :unprocessable_entity,
+                :message => "#{e}"
+
+            }   
+        end 
+    end
+
     def destroy 
-        binding.pry
+        begin
 
         @note.delete
 
         render :json => { 
             :status => :ok, 
             :message => "Successfully deleted!",
-          
+            
          }
-
+        rescue StandardError => e
+            render :json=>{
+                :status => :Unprocessable_Entity,
+                :message => "#{e}"
+            } 
+        end
     end
+    
+    
     private
 
     def alien_params

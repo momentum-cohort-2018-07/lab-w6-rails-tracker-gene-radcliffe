@@ -1,8 +1,19 @@
 class Api::V1::AliensController < ApplicationController
     before_action :find_alien, only: [:show, :update, :destroy]
     def index
-        @aliens = Alien.all
-        render json: @aliens
+        
+        if params[:name]!= nil then
+            @alien = Alien.find_by_name(params[:name])
+            render :json => {
+                :status => :ok,
+                :message => "record found",
+                :data => @alien
+
+            }
+        else
+            @aliens = Alien.all
+            render json: @aliens
+        end
     end
     def show
         render json: @alien
